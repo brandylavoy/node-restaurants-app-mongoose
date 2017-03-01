@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
+var mongoose = require('mongoose');
 
 // this is our schema to represent a restaurant
-const restaurantSchema = mongoose.Schema({
-  name: {type: String, required: true},
-  borough: {type: String, required: true},
-  cuisine: {type: String, required: true},
+var restaurantSchema = mongoose.Schema({
+  name: { type: String, required: true },
+  borough: { type: String, required: true },
+  cuisine: { type: String, required: true },
   address: {
     building: String,
     // coord will be an array of string values
@@ -25,19 +25,22 @@ const restaurantSchema = mongoose.Schema({
 // properties that are stored in the database. Here we use it
 // to generate a human readable string based on the address object
 // we're storing in Mongo.
-restaurantSchema.virtual('addressString').get(function() {
-  return `${this.address.building} ${this.address.street}`.trim()});
+restaurantSchema.virtual('addressString').get(function () {
+  return (this.address.building + ' ' + this.address.street).trim();
+});
 
 // this virtual grabs the most recent grade for a restaurant.
-restaurantSchema.virtual('grade').get(function() {
-  const gradeObj = this.grades.sort((a, b) => {return b.date - a.date})[0] || {};
+restaurantSchema.virtual('grade').get(function () {
+  var gradeObj = this.grades.sort(function (a, b) {
+    return b.date - a.date;
+  })[0] || {};
   return gradeObj.grade;
 });
 
 // this is an *instance method* which will be available on all instances
 // of the model. This method will be used to return an object that only
 // exposes *some* of the fields we want from the underlying data
-restaurantSchema.methods.apiRepr = function() {
+restaurantSchema.methods.apiRepr = function () {
 
   return {
     id: this._id,
@@ -47,10 +50,10 @@ restaurantSchema.methods.apiRepr = function() {
     grade: this.grade,
     address: this.addressString
   };
-}
+};
 
 // note that all instance methods and virtual properties on our
 // schema must be defined *before* we make the call to `.model`.
-const Restaurant = mongoose.model('Restaurant', restaurantSchema);
+var Restaurant = mongoose.model('Restaurant', restaurantSchema);
 
-module.exports = {Restaurant};
+module.exports = { Restaurant: Restaurant };
