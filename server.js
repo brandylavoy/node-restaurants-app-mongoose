@@ -57,11 +57,21 @@ app.get('/restaurants/:id', function (req, res) {
 
 app.post('/restaurants', function (req, res) {
 
+<<<<<<< HEAD
   var requiredFields = ['name', 'borough', 'cuisine'];
   for (var i = 0; i < requiredFields.length; i++) {
     var field = requiredFields[i];
     if (!(field in req.body)) {
       var message = 'Missing `' + field + '` in request body';
+=======
+app.post('/restaurants', (req, res) => {
+
+  const requiredFields = ['name', 'borough', 'cuisine'];
+  for (let i=0; i<requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      const message = `Missing \`${field}\` in request body`
+>>>>>>> b3ca314d0e194f4b52caba62713bc8dd1b446c00
       console.error(message);
       return res.status(400).send(message);
     }
@@ -128,6 +138,7 @@ app.use('*', function (req, res) {
 var server = void 0;
 
 // this function connects to our database, then starts the server
+<<<<<<< HEAD
 function runServer() {
   var databaseUrl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DATABASE_URL;
   var port = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : PORT;
@@ -140,6 +151,17 @@ function runServer() {
       }
       server = app.listen(port, function () {
         console.log('Your app is listening on port ' + port);
+=======
+function runServer(databaseUrl=DATABASE_URL, port=PORT) {
+
+  return new Promise((resolve, reject) => {
+    mongoose.connect(databaseUrl, err => {
+      if (err) {
+        return reject(err);
+      }
+      server = app.listen(port, () => {
+        console.log(`Your app is listening on port ${port}`);
+>>>>>>> b3ca314d0e194f4b52caba62713bc8dd1b446c00
         resolve();
       }).on('error', function (err) {
         mongoose.disconnect();
