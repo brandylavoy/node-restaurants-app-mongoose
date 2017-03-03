@@ -1,5 +1,4 @@
 language: node_js
 node_js: node
-services:
-- mongodb
-deploy:app:fast-bastion-91082
+services: mongodb
+deploy: app:fast-bastion-91082
