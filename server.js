@@ -20,116 +20,124 @@ var app = express();
 app.use(bodyParser.json());
 
 // GET requests to /restaurants => return 10 restaurants
-app.get('/restaurants', function (req, res) {
-  Restaurant.find()
-  // we're limiting because restaurants db has > 25,000
-  // documents, and that's too much to process/return
-  .limit(10)
-  // `exec` returns a promise
-  .exec()
-  // success callback: for each restaurant we got back, we'll
-  // call the `.apiRepr` instance method we've created in
-  // models.js in order to only expose the data we want the API return.
-  .then(function (restaurants) {
-    res.json({
-      restaurants: restaurants.map(function (restaurant) {
-        return restaurant.apiRepr();
-      })
-    });
-  }).catch(function (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Internal server error' });
-  });
+app.get('/restaurants', function(req, res) {
+    Restaurant.find()
+        // we're limiting because restaurants db has > 25,000
+        // documents, and that's too much to process/return
+        .limit(10)
+        // `exec` returns a promise
+        .exec()
+        // success callback: for each restaurant we got back, we'll
+        // call the `.apiRepr` instance method we've created in
+        // models.js in order to only expose the data we want the API return.
+        .then(function(restaurants) {
+            res.json({
+                restaurants: restaurants.map(function(restaurant) {
+                    return restaurant.apiRepr();
+                })
+            });
+        }).catch(function(err) {
+            console.error(err);
+            res.status(500).json({
+                message: 'Internal server error'
+            });
+        });
 });
 
 // can also request by ID
-app.get('/restaurants/:id', function (req, res) {
-  Restaurant
-  // this is a convenience method Mongoose provides for searching
-  // by the object _id property
-  .findById(req.params.id).exec().then(function (restaurant) {
-    return res.json(restaurant.apiRepr());
-  }).catch(function (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Internal server error' });
-  });
+app.get('/restaurants/:id', function(req, res) {
+    Restaurant
+    // this is a convenience method Mongoose provides for searching
+    // by the object _id property
+        .findById(req.params.id).exec().then(function(restaurant) {
+        return res.json(restaurant.apiRepr());
+    }).catch(function(err) {
+        console.error(err);
+        res.status(500).json({
+            message: 'Internal server error'
+        });
+    });
 });
 
-app.post('/restaurants', function (req, res) {
+app.post('/restaurants', function(req, res) {
 
-<<<<<<< HEAD
-  var requiredFields = ['name', 'borough', 'cuisine'];
-  for (var i = 0; i < requiredFields.length; i++) {
-    var field = requiredFields[i];
-    if (!(field in req.body)) {
-      var message = 'Missing `' + field + '` in request body';
-=======
-app.post('/restaurants', (req, res) => {
 
-  const requiredFields = ['name', 'borough', 'cuisine'];
-  for (let i=0; i<requiredFields.length; i++) {
-    const field = requiredFields[i];
-    if (!(field in req.body)) {
-      const message = `Missing \`${field}\` in request body`
->>>>>>> b3ca314d0e194f4b52caba62713bc8dd1b446c00
-      console.error(message);
-      return res.status(400).send(message);
+    var requiredFields = ['name', 'borough', 'cuisine'];
+    for (var i = 0; i < requiredFields.length; i++) {
+        var field = requiredFields[i];
+        if (!(field in req.body)) {
+            var message = 'Missing ' + field + ' in request body';
+            console.error(message);
+            return res.status(400).send(message);
+        }
     }
-  }
 
-  Restaurant.create({
-    name: req.body.name,
-    borough: req.body.borough,
-    cuisine: req.body.cuisine,
-    grades: req.body.grades,
-    address: req.body.address }).then(function (restaurant) {
-    return res.status(201).json(restaurant.apiRepr());
-  }).catch(function (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Internal server error' });
-  });
+    Restaurant.create({
+        name: req.body.name,
+        borough: req.body.borough,
+        cuisine: req.body.cuisine,
+        grades: req.body.grades,
+        address: req.body.address
+    }).then(function(restaurant) {
+        return res.status(201).json(restaurant.apiRepr());
+    }).catch(function(err) {
+        console.error(err);
+        res.status(500).json({
+            message: 'Internal server error'
+        });
+    });
 });
 
-app.put('/restaurants/:id', function (req, res) {
-  // ensure that the id in the request path and the one in request body match
-  if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
-    var message = 'Request path id (' + req.params.id + ') and request body id ' + ('(' + req.body.id + ') must match');
-    console.error(message);
-    res.status(400).json({ message: message });
-  }
-
-  // we only support a subset of fields being updateable.
-  // if the user sent over any of the updatableFields, we udpate those values
-  // in document
-  var toUpdate = {};
-  var updateableFields = ['name', 'borough', 'cuisine', 'address'];
-
-  updateableFields.forEach(function (field) {
-    if (field in req.body) {
-      toUpdate[field] = req.body[field];
+app.put('/restaurants/:id', function(req, res) {
+    // ensure that the id in the request path and the one in request body match
+    if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
+        var message = 'Request path id (' + req.params.id + ') and request body id ' + ('(' + req.body.id + ') must match');
+        console.error(message);
+        res.status(400).json({
+            message: message
+        });
     }
-  });
 
-  Restaurant
-  // all key/value pairs in toUpdate will be updated -- that's what `$set` does
-  .findByIdAndUpdate(req.params.id, { $set: toUpdate }).exec().then(function (restaurant) {
-    return res.status(204).end();
-  }).catch(function (err) {
-    return res.status(500).json({ message: 'Internal server error' });
-  });
+    // we only support a subset of fields being updateable.
+    // if the user sent over any of the updatableFields, we udpate those values
+    // in document
+    var toUpdate = {};
+    var updateableFields = ['name', 'borough', 'cuisine', 'address'];
+
+    updateableFields.forEach(function(field) {
+        if (field in req.body) {
+            toUpdate[field] = req.body[field];
+        }
+    });
+
+    Restaurant
+    // all key/value pairs in toUpdate will be updated -- that's what `$set` does
+        .findByIdAndUpdate(req.params.id, {
+        $set: toUpdate
+    }).exec().then(function(restaurant) {
+        return res.status(204).end();
+    }).catch(function(err) {
+        return res.status(500).json({
+            message: 'Internal server error'
+        });
+    });
 });
 
-app.delete('/restaurants/:id', function (req, res) {
-  Restaurant.findByIdAndRemove(req.params.id).exec().then(function (restaurant) {
-    return res.status(204).end();
-  }).catch(function (err) {
-    return res.status(500).json({ message: 'Internal server error' });
-  });
+app.delete('/restaurants/:id', function(req, res) {
+    Restaurant.findByIdAndRemove(req.params.id).exec().then(function(restaurant) {
+        return res.status(204).end();
+    }).catch(function(err) {
+        return res.status(500).json({
+            message: 'Internal server error'
+        });
+    });
 });
 
 // catch-all endpoint if client makes request to non-existent endpoint
-app.use('*', function (req, res) {
-  res.status(404).json({ message: 'Not Found' });
+app.use('*', function(req, res) {
+    res.status(404).json({
+        message: 'Not Found'
+    });
 });
 
 // closeServer needs access to a server object, but that only
@@ -138,7 +146,6 @@ app.use('*', function (req, res) {
 var server = void 0;
 
 // this function connects to our database, then starts the server
-<<<<<<< HEAD
 function runServer() {
   var databaseUrl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DATABASE_URL;
   var port = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : PORT;
@@ -151,17 +158,6 @@ function runServer() {
       }
       server = app.listen(port, function () {
         console.log('Your app is listening on port ' + port);
-=======
-function runServer(databaseUrl=DATABASE_URL, port=PORT) {
-
-  return new Promise((resolve, reject) => {
-    mongoose.connect(databaseUrl, err => {
-      if (err) {
-        return reject(err);
-      }
-      server = app.listen(port, () => {
-        console.log(`Your app is listening on port ${port}`);
->>>>>>> b3ca314d0e194f4b52caba62713bc8dd1b446c00
         resolve();
       }).on('error', function (err) {
         mongoose.disconnect();
